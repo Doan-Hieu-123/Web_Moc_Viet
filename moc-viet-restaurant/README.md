@@ -1,36 +1,143 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MỘC VIỆT Restaurant
 
-## Getting Started
+Website giới thiệu nhà hàng và hệ thống đặt bàn, quản lý vận hành cho nhà hàng MỘC VIỆT.
+## Công nghệ
 
-First, run the development server:
+- Next.js 16 với App Router
+- React 19 và TypeScript
+- Tailwind CSS 4
+- SQLite với `better-sqlite3`
+- Xác thực tài khoản bằng cookie HttpOnly
+## Chức năng chính
+
+- Trang chủ, câu chuyện, thực đơn, món đặc trưng, đầu bếp, không gian và sự kiện
+- Xem thực đơn theo danh mục và chi tiết món ăn
+- Đăng ký, đăng nhập và quản lý tài khoản khách hàng
+- Đặt bàn bắt buộc đăng nhập
+- Tự điền họ tên, email và số điện thoại khi đặt bàn
+- Đề xuất khu vực theo số lượng khách
+- Khu vực quản trị dành cho tài khoản ADMIN
+- Quản lý đặt bàn, bàn ăn, thực đơn, sự kiện, khách hàng và đánh giá
+- Tự động cập nhật trạng thái đặt bàn và làm mới danh sách quản lý
+
+## Yêu cầu môi trường
+- Node.js 20.9 trở lên
+- npm
+- SQLite CLI nếu cần tạo database bằng `schema.sql`
+Kiểm tra phiên bản:
+
+```text
+.env
+dev.db
+node_modules/
+.next/
+out/
+dist/
+coverage/
+*.tsbuildinfo
+```
+
+Sau khi clone, thành viên trong team chỉ cần tạo database mới theo phần cài đặt ở trên.
+cd moc-viet-restaurant
+```
+
+Cài dependency:
+
+```bash
+npm install
+```
+
+Tạo database SQLite từ schema:
+
+```bash
+sqlite3 dev.db ".read schema.sql"
+```
+
+Tạo dữ liệu mẫu:
+
+```bash
+npm run seed
+```
+
+Script seed tạo dữ liệu menu, bàn ăn và tài khoản quản trị mẫu. Script dùng `INSERT OR IGNORE`, nên có thể chạy lại mà không tạo bản ghi trùng.
+
+## Chạy project
+
+Chạy môi trường phát triển:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Mở [http://localhost:3000](http://localhost:3000) trên trình duyệt.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Các lệnh khác:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build   # kiểm tra và tạo bản build production
+npm start       # chạy bản build production
+npm run lint    # kiểm tra lint
+```
 
-## Learn More
+## Tài khoản quản trị mẫu
 
-To learn more about Next.js, take a look at the following resources:
+Sau khi chạy `npm run seed`:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```text
+Email: admin@mocviet.vn
+Mật khẩu: MocViet@2026
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Không sử dụng mật khẩu này trong môi trường thật. Khi triển khai chính thức, hãy đổi thông tin đăng nhập và không commit thông tin bí mật lên GitHub.
 
-## Deploy on Vercel
+## Database
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Ứng dụng hiện mở database SQLite tại file `dev.db` trong thư mục project. Cấu trúc database nằm trong [schema.sql](schema.sql), còn dữ liệu mẫu nằm trong [scripts/seed.ts](scripts/seed.ts).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Để xóa toàn bộ dữ liệu đặt bàn mà không xóa bảng:
+
+```bash
+sqlite3 dev.db ".read scripts/clear-reservations.sql"
+```
+
+Lệnh trên chỉ nên dùng khi muốn xóa dữ liệu reservation. Hãy sao lưu `dev.db` trước khi thao tác với dữ liệu quan trọng.
+
+## Biến môi trường
+
+File `.env` là file local và không nên commit. File `.env.example` chỉ dùng làm mẫu cấu hình cho thành viên trong team.
+
+Hiện tại database được mở trực tiếp bằng `dev.db` trong mã nguồn. Biến `DATABASE_URL` chưa được sử dụng để chọn database runtime.
+
+## Quy tắc commit
+
+Nên commit:
+
+```text
+src/
+public/
+scripts/
+schema.sql
+package.json
+package-lock.json
+tsconfig.json
+next.config.ts
+postcss.config.mjs
+eslint.config.mjs
+.env.example
+README.md
+```
+
+Không commit:
+
+```text
+.env
+dev.db
+node_modules/
+.next/
+out/
+dist/
+coverage/
+*.tsbuildinfo
+```
+
+Sau khi clone, thành viên trong team chỉ cần tạo database mới theo phần cài đặt ở trên.
