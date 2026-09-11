@@ -96,7 +96,7 @@ export function getTables() {
   return db.prepare("SELECT * FROM RestaurantTable ORDER BY tableNumber").all();
 }
 
-export function checkTableAvailability(capacity: number, dateTime: string) {
+export function checkTableAvailability(capacity: number, dateTime: string, area?: string) {
   const db = getDatabase();
   const tables = db
     .prepare(
@@ -104,12 +104,13 @@ export function checkTableAvailability(capacity: number, dateTime: string) {
     SELECT rt.id, rt.tableNumber, rt.capacity, rt.status
     FROM RestaurantTable rt
     WHERE rt.capacity >= ?
+      AND (? IS NULL OR rt.area = ?)
       AND (rt.status = 'AVAILABLE' OR (rt.id NOT IN (
         SELECT tableId FROM Reservation WHERE DATE(date) = DATE(?) AND status != 'CANCELLED'
       )))
     ORDER BY rt.capacity
     `
     )
-    .all(capacity, dateTime);
+    .all(capacity, area || null, area || null, dateTime);
   return tables;
 }

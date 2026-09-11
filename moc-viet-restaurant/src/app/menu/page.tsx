@@ -1,7 +1,6 @@
 import { getMenuItems } from "@/lib/db";
 import Link from "next/link";
 import { Heart } from "lucide-react";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export default async function MenuPage() {
@@ -62,8 +61,6 @@ export default async function MenuPage() {
 
   return (
     <div className="min-h-screen bg-amber-50">
-      <Header />
-
       {/* Hero Section */}
       <section className="pt-32 pb-16 px-4 bg-gradient-to-b from-amber-100 to-amber-50">
         <div className="max-w-6xl mx-auto text-center">

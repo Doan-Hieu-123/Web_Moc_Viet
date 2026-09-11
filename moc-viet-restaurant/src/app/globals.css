@@ -55,3 +55,27 @@ option {
   color: #3b291e;
   background-color: #fffdf8;
 }
+
+.admin-menu-scroll {
+  scrollbar-width: auto;
+  scrollbar-color: #a64b32 #eadcc8;
+}
+
+.admin-menu-scroll::-webkit-scrollbar {
+  width: 14px;
+}
+
+.admin-menu-scroll::-webkit-scrollbar-track {
+  background: #eadcc8;
+  border-left: 1px solid #d9c5ad;
+}
+
+.admin-menu-scroll::-webkit-scrollbar-thumb {
+  background: #a64b32;
+  border: 3px solid #eadcc8;
+  border-radius: 999px;
+}
+
+.admin-menu-scroll::-webkit-scrollbar-thumb:hover {
+  background: #7b3515;
+}

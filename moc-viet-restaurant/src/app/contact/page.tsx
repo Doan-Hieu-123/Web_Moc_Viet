@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 interface ContactFormData {
@@ -74,8 +73,6 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-amber-50">
-      <Header />
-
       {/* Hero Section */}
       <section className="pt-32 pb-16 px-4 bg-gradient-to-b from-amber-100 to-amber-50">
         <div className="max-w-4xl mx-auto text-center">
@@ -263,7 +260,7 @@ export default function ContactPage() {
                     <h3 className="text-lg font-bold text-amber-950 mb-2">
                       Giờ mở cửa
                     </h3>
-                    <p className="text-amber-800 space-y-1">
+                    <div className="text-amber-800 space-y-1">
                       <div>
                         <span className="font-semibold">Thứ Hai - Thứ Năm:</span>{" "}
                         10:00 - 23:00
@@ -276,7 +273,7 @@ export default function ContactPage() {
                         <span className="font-semibold">Lễ/Tết:</span> 9:00 -
                         24:00
                       </div>
-                    </p>
+                    </div>
                   </div>
                 </div>
               </div>

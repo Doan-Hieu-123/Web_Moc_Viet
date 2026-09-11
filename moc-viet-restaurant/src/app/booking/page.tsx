@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Calendar, Clock, Users, Phone, Mail, MapPin, CheckCircle } from "lucide-react";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 interface BookingFormData {
@@ -16,7 +16,15 @@ interface BookingFormData {
   specialRequest: string;
 }
 
+interface BookingUser {
+  fullName: string;
+  email: string;
+  phone?: string | null;
+}
+
 export default function BookingPage() {
+  const [currentUser, setCurrentUser] = useState<BookingUser | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const [formData, setFormData] = useState<BookingFormData>({
     guestName: "",
     guestPhone: "",
@@ -24,7 +32,7 @@ export default function BookingPage() {
     date: "",
     time: "",
     guestCount: 2,
-    area: "Tây",
+    area: "Bàn bên cửa sổ",
     specialRequest: "",
   });
 
@@ -33,11 +41,41 @@ export default function BookingPage() {
   const [bookingReference, setBookingReference] = useState("");
   const [confirmedBooking, setConfirmedBooking] = useState<BookingFormData | null>(null);
 
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((response) => response.json())
+      .then((data: { user: BookingUser | null }) => {
+        setCurrentUser(data.user);
+        if (data.user) {
+          setFormData((prev) => ({
+            ...prev,
+            guestName: data.user?.fullName || "",
+            guestEmail: data.user?.email || "",
+            guestPhone: data.user?.phone || "",
+          }));
+        }
+      })
+      .catch(() => setCurrentUser(null))
+      .finally(() => setAuthLoading(false));
+  }, []);
+
   const areas = [
-    { value: "Tây", label: "Khu vực Tây" },
-    { value: "Đông", label: "Khu vực Đông" },
-    { value: "Trung tâm", label: "Khu vực Trung tâm" },
+    { value: "Phòng ăn chính", label: "Phòng ăn chính", minGuests: 3, maxGuests: 5 },
+    { value: "Sân vườn", label: "Sân vườn", minGuests: 6, maxGuests: 7 },
+    { value: "Bàn bên cửa sổ", label: "Bàn bên cửa sổ", minGuests: 1, maxGuests: 2 },
+    { value: "Phòng riêng", label: "Phòng riêng", minGuests: 8, maxGuests: 9 },
+    { value: "Bàn gia đình", label: "Bàn gia đình", minGuests: 10, maxGuests: 12 },
   ];
+
+  const recommendedArea = areas.find(
+    (area) => formData.guestCount >= area.minGuests && formData.guestCount <= area.maxGuests,
+  );
+
+  useEffect(() => {
+    if (recommendedArea) {
+      setFormData((prev) => ({ ...prev, area: recommendedArea.value }));
+    }
+  }, [formData.guestCount]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -54,6 +92,10 @@ export default function BookingPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!currentUser) {
+      alert("Vui lòng đăng nhập để đặt bàn.");
+      return;
+    }
     setIsSubmitting(true);
 
     try {
@@ -93,7 +135,7 @@ export default function BookingPage() {
         date: "",
         time: "",
         guestCount: 2,
-        area: "Tây",
+        area: "Bàn bên cửa sổ",
         specialRequest: "",
       });
     } catch (error) {
@@ -106,8 +148,6 @@ export default function BookingPage() {
   if (bookingSuccess) {
     return (
       <div className="min-h-screen bg-amber-50">
-        <Header />
-
         <section className="py-20 px-4">
           <div className="max-w-2xl mx-auto text-center">
             <div className="mb-6 flex justify-center">
@@ -200,10 +240,37 @@ export default function BookingPage() {
     );
   }
 
+  if (authLoading) {
+    return <div className="min-h-screen bg-amber-50 pt-40 text-center text-amber-900">Đang kiểm tra tài khoản...</div>;
+  }
+
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-amber-50">
+        <section className="pt-32 pb-20 px-4">
+          <div className="max-w-xl mx-auto bg-white rounded-lg shadow-lg p-8 md:p-12 text-center">
+            <div className="mb-4 text-5xl">🔐</div>
+            <h1 className="text-3xl font-bold text-amber-950 mb-4">ĐĂNG NHẬP ĐỂ ĐẶT BÀN</h1>
+            <p className="text-amber-800 mb-8">
+              Vui lòng đăng nhập trước khi đặt bàn. Thông tin tài khoản của bạn sẽ được tự động điền vào phiếu đặt bàn.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link href="/login?next=/booking" className="px-6 py-3 bg-amber-900 text-white font-semibold rounded-lg hover:bg-amber-800">
+                ĐĂNG NHẬP
+              </Link>
+              <Link href="/register?next=/booking" className="px-6 py-3 border-2 border-amber-900 text-amber-900 font-semibold rounded-lg hover:bg-amber-50">
+                ĐĂNG KÝ TÀI KHOẢN
+              </Link>
+            </div>
+          </div>
+        </section>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-amber-50">
-      <Header />
-
       {/* Hero Section */}
       <section className="pt-32 pb-16 px-4 bg-gradient-to-b from-amber-100 to-amber-50">
         <div className="max-w-4xl mx-auto text-center">
@@ -361,7 +428,7 @@ export default function BookingPage() {
                             area: area.value,
                           }))
                         }
-                        className={`p-4 rounded-lg border-2 transition-all ${
+                        className={`relative p-4 rounded-lg border-2 transition-all ${
                           formData.area === area.value
                             ? "border-amber-900 bg-amber-50"
                             : "border-amber-200 hover:border-amber-400"
@@ -370,9 +437,19 @@ export default function BookingPage() {
                         <p className="font-semibold text-amber-950">
                           {area.label}
                         </p>
+                        {recommendedArea?.value === area.value && (
+                          <span className="absolute -top-3 left-3 rounded-full bg-green-700 px-2 py-1 text-xs font-semibold text-white">
+                            Đề xuất cho {formData.guestCount} khách
+                          </span>
+                        )}
                       </button>
                     ))}
                   </div>
+                  <p className="mt-4 text-sm text-amber-700">
+                    {recommendedArea
+                      ? `Với ${formData.guestCount} khách, chúng tôi đề xuất ${recommendedArea.label}. Bạn vẫn có thể chọn khu vực khác.`
+                      : "Số lượng khách này cần được nhà hàng xác nhận khu vực phù hợp."}
+                  </p>
                 </div>
               </div>
 

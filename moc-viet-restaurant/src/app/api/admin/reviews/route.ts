@@ -1,0 +1,6 @@
+import { requireAdmin } from "@/lib/admin";
+import { getDatabase } from "@/lib/db";
+import { NextRequest, NextResponse } from "next/server";
+
+export async function GET() { try { await requireAdmin(); return NextResponse.json(getDatabase().prepare("SELECT r.*, u.fullName, u.email FROM Review r JOIN User u ON u.id = r.userId ORDER BY r.createdAt DESC").all()); } catch (error) { if (error instanceof Error && error.message === "FORBIDDEN") return NextResponse.json({ error: "Bạn không có quyền quản trị." }, { status: 403 }); return NextResponse.json({ error: "Không thể tải đánh giá." }, { status: 500 }); } }
+export async function DELETE(request: NextRequest) { try { await requireAdmin(); const id = request.nextUrl.searchParams.get("id"); if (!id) return NextResponse.json({ error: "Thiếu mã đánh giá." }, { status: 400 }); getDatabase().prepare("DELETE FROM Review WHERE id = ?").run(id); return NextResponse.json({ message: "Đã xóa đánh giá." }); } catch (error) { if (error instanceof Error && error.message === "FORBIDDEN") return NextResponse.json({ error: "Bạn không có quyền quản trị." }, { status: 403 }); return NextResponse.json({ error: "Không thể xóa đánh giá." }, { status: 500 }); } }

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 const photos = [
@@ -30,7 +29,6 @@ export default function GalleryPage() {
 
   return (
     <div className="min-h-screen bg-[#f7f1e7]">
-      <Header />
       <main className="pt-32 pb-20 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">

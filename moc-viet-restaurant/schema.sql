@@ -70,6 +70,21 @@ CREATE TABLE IF NOT EXISTS Review (
   FOREIGN KEY (userId) REFERENCES User(id) ON DELETE CASCADE
 );
 
+-- Events managed by administrators
+CREATE TABLE IF NOT EXISTS Event (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  date TEXT NOT NULL,
+  time TEXT NOT NULL,
+  location TEXT NOT NULL,
+  capacity TEXT NOT NULL,
+  price TEXT NOT NULL,
+  image TEXT,
+  isPublished BOOLEAN DEFAULT 1,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_User_email ON User(email);
 CREATE INDEX IF NOT EXISTS idx_Reservation_userId ON Reservation(userId);
@@ -78,3 +93,4 @@ CREATE INDEX IF NOT EXISTS idx_Reservation_date ON Reservation(date);
 CREATE INDEX IF NOT EXISTS idx_Favorite_userId ON Favorite(userId);
 CREATE INDEX IF NOT EXISTS idx_Review_userId ON Review(userId);
 CREATE INDEX IF NOT EXISTS idx_MenuItem_category ON MenuItem(category);
+CREATE INDEX IF NOT EXISTS idx_Event_date ON Event(date);

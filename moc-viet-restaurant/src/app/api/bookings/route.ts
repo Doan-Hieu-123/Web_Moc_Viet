@@ -1,4 +1,5 @@
-import { checkTableAvailability, createReservation } from "@/lib/db";
+import { checkTableAvailability, createReservation, getDatabase } from "@/lib/db";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 interface BookingPayload {
@@ -14,6 +15,18 @@ interface BookingPayload {
 
 export async function POST(request: NextRequest) {
   try {
+    const userId = (await cookies()).get("moc_viet_user")?.value;
+    if (!userId) {
+      return NextResponse.json({ error: "Vui lòng đăng nhập để đặt bàn." }, { status: 401 });
+    }
+
+    const user = getDatabase()
+      .prepare("SELECT fullName, email, phone FROM User WHERE id = ?")
+      .get(userId) as { fullName: string; email: string; phone?: string | null } | undefined;
+    if (!user) {
+      return NextResponse.json({ error: "Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại." }, { status: 401 });
+    }
+
     const body = (await request.json()) as BookingPayload;
     const guestCount = Number(body.guestCount);
 
@@ -26,7 +39,7 @@ export async function POST(request: NextRequest) {
     }
 
     const dateTime = `${body.date} ${body.time}`;
-    const availableTables = checkTableAvailability(guestCount, dateTime) as Array<{ id: string }>;
+    const availableTables = checkTableAvailability(guestCount, dateTime, body.area) as Array<{ id: string }>;
     const table = availableTables[0];
 
     if (!table) {
@@ -38,12 +51,13 @@ export async function POST(request: NextRequest) {
 
     const reference = `MV-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
     createReservation({
-      guestName: body.guestName.trim(),
-      guestPhone: body.guestPhone.trim(),
+      userId,
+      guestName: user.fullName,
+      guestPhone: user.phone?.trim() || body.guestPhone.trim(),
       tableId: table.id,
       date: dateTime,
       guestsCount: guestCount,
-      specialReq: [body.guestEmail, body.area, body.specialRequest].filter(Boolean).join(" | "),
+      specialReq: [user.email, body.area, body.specialRequest].filter(Boolean).join(" | "),
       status: "PENDING",
     });
 

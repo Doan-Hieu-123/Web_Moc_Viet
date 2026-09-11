@@ -1,4 +1,3 @@
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Link from "next/link";
 import { Award, Utensils, Heart } from "lucide-react";
@@ -30,8 +29,6 @@ export default function ChefPage() {
 
   return (
     <div className="min-h-screen bg-amber-50">
-      <Header />
-
       {/* Hero Section */}
       <section className="pt-32 pb-16 px-4 bg-gradient-to-b from-amber-100 to-amber-50">
         <div className="max-w-4xl mx-auto text-center">

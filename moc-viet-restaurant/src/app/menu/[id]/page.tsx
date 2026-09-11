@@ -1,7 +1,6 @@
 import { getMenuItems } from "@/lib/db";
 import Link from "next/link";
 import { ArrowLeft, Heart, ShoppingCart } from "lucide-react";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export default async function MenuItemDetailPage({
@@ -18,7 +17,6 @@ export default async function MenuItemDetailPage({
   if (!item) {
     return (
       <div className="min-h-screen bg-amber-50">
-        <Header />
         <div className="pt-32 pb-16 px-4">
           <div className="max-w-2xl mx-auto text-center">
             <h1 className="text-3xl font-bold text-amber-950">Không tìm thấy</h1>
@@ -50,8 +48,6 @@ export default async function MenuItemDetailPage({
 
   return (
     <div className="min-h-screen bg-amber-50">
-      <Header />
-
       <div className="pt-32 pb-16 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Back Button */}
